@@ -27,7 +27,10 @@ class Article extends Model
         'category_id' => 'integer',
         'user_id' => 'integer',
     ];
-
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
