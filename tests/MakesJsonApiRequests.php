@@ -2,6 +2,7 @@
 
 namespace tests;
 
+use App\JsonApi\Document;
 use Closure;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -52,15 +53,15 @@ trait MakesJsonApiRequests
     public function getFormattedData($uri, array $data) : array
     {
         $path = parse_url($uri)['path'];
+
         $type = (string) Str::of($path)->after('api/v1/')->before('/');
+
         $id = (string) Str::of($path)->after($type)->replace('/', '');
 
-        return [
-            'data' => array_filter([
-                'type' => $type,
-                'id' => $id,
-                'attributes' => $data
-            ])
-        ];
+        return Document::type($type)
+            ->id($id)
+            ->attributes($data)
+            ->relationshipsData($data['_relationships'] ?? [])
+            ->toArray();
     }
 }

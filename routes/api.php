@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,5 +31,15 @@ use Illuminate\Support\Facades\Route;
 // Route::delete('articles/{article}', [ArticleController::class, 'destroy'])
 //     ->name('api.v1.articles.destroy');
 
-Route::apiResource('articles', ArticleController::class)
-    ->names('api.v1.articles');
+Route::name('api.v1.')->group(function () {
+    Route::apiResource('articles', ArticleController::class);
+
+    Route::apiResource('categories', CategoryController::class)
+        ->only('index', 'show');
+});
+
+Route::get('articles/{article}/relationships/category', fn () => 'TODO')
+    ->name('api.v1.articles.relationships.category');
+
+Route::get('articles/{article}/category', fn () => 'TODO')
+    ->name('api.v1.articles.category');
