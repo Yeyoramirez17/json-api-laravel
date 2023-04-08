@@ -11,9 +11,7 @@ class ListCategoriesTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_fetch_a_single_category(): void
     {
         $category = Category::factory()->create();
@@ -24,9 +22,7 @@ class ListCategoriesTest extends TestCase
             'name' => $category->name
         ]);
     }
-    /**
-     * @test
-     */
+    /** @test */
     public function can_fetch_all_categories()
     {
         $categories = Category::factory()->count(3)->create();

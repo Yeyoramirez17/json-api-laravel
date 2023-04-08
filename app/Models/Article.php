@@ -26,7 +26,7 @@ class Article extends Model
     protected $casts = [
         'id' => 'integer',
         'category_id' => 'integer',
-        'user_id' => 'integer',
+        'user_id' => 'string',
     ];
     public $resourceType = 'articles';
     public function getRouteKeyName()
@@ -38,9 +38,9 @@ class Article extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function user(): BelongsTo
+    public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
     public function scopeYear(Builder $query, $year)
     {
@@ -49,5 +49,13 @@ class Article extends Model
     public function scopeMonth(Builder $query, $month)
     {
         $query->whereMonth('created_at', $month);
+    }
+    public function scopeCategories(Builder $query, $categories)
+    {
+        $categorySlugs = explode(',', $categories);
+
+        $query->whereHas('category', function($q) use($categorySlugs){
+            $q->whereIn('slug', $categorySlugs);
+        });
     }
 }

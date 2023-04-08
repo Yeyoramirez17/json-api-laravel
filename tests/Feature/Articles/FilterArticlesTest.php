@@ -3,6 +3,7 @@
 namespace Tests\Feature\Articles;
 
 use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -11,9 +12,7 @@ class FilterArticlesTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_filter_articles_by_title(): void
     {
         Article::factory()->create([
@@ -35,9 +34,7 @@ class FilterArticlesTest extends TestCase
             ->assertSee('Aprende laravel desde cero.')
             ->assertDontSee('Other Article.');
     }
-    /**
-     * @test
-     */
+    /** @test */
     public function can_filter_articles_by_content(): void
     {
         Article::factory()->create([
@@ -59,9 +56,7 @@ class FilterArticlesTest extends TestCase
             ->assertSee('Aprende laravel desde cero.')
             ->assertDontSee('Other Article.');
     }
-    /**
-     * @test
-     */
+    /** @test */
     public function can_filter_articles_by_year(): void
     {
         Article::factory()->create([
@@ -85,9 +80,7 @@ class FilterArticlesTest extends TestCase
             ->assertSee('Article from 2021')
             ->assertDontSee('Article from 2023');
     }
-    /**
-     * @test
-     */
+    /** @test */
     public function can_filter_articles_by_month(): void
     {
         Article::factory()->create([
@@ -116,9 +109,28 @@ class FilterArticlesTest extends TestCase
             ->assertSee('Another Article from month 3')
             ->assertDontSee('Article from month 1');
     }
-    /**
-     * @test
-     */
+    /** @test */
+    public function can_filter_articles_by_category(): void
+    {
+        Article::factory()->count(2)->create();
+        $category1 = Category::factory()->hasArticles(3)->create(['slug' => 'cat-1']);
+        $category2 = Category::factory()->hasArticles()->create(['slug' => 'cat-2']);
+
+        // articles?filter[categories]=category1
+        $url = route('api.v1.articles.index', [
+            'filter' => [
+                'categories' => 'cat-1,cat-2'
+            ]
+        ]);
+
+        $this->getJson($url)
+            ->assertJsonCount(4, 'data')
+            ->assertSee($category1->articles[0]->title)
+            ->assertSee($category1->articles[1]->title)
+            ->assertSee($category1->articles[2]->title)
+            ->assertSee($category2->articles[0]->title);
+    }
+    /** @test */
     public function cannot_filter_articles_by_unknown_filters(): void
     {
         Article::factory()->count(2)->create();

@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\ArticleAuthorController;
+use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,10 +39,19 @@ Route::name('api.v1.')->group(function () {
 
     Route::apiResource('categories', CategoryController::class)
         ->only('index', 'show');
+
+    Route::apiResource('authors', AuthorController::class)
+        ->only('index', 'show');
 });
 
-Route::get('articles/{article}/relationships/category', fn () => 'TODO')
+Route::get('articles/{article}/relationships/category', [ArticleCategoryController::class, 'index'])
     ->name('api.v1.articles.relationships.category');
 
-Route::get('articles/{article}/category', fn () => 'TODO')
+Route::get('articles/{article}/category', [ArticleCategoryController::class, 'show'])
     ->name('api.v1.articles.category');
+
+Route::get('articles/{article}/relationships/author', [ArticleAuthorController::class, 'index'])
+    ->name('api.v1.articles.relationships.author');
+
+Route::get('articles/{article}/author', [ArticleAuthorController::class, 'show'])
+    ->name('api.v1.articles.author');
