@@ -3,6 +3,7 @@
 namespace Tests\Feature\Articles;
 
 use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -44,6 +45,57 @@ class CategoryRelationshipTest extends TestCase
                     'name' => $article->category->name
                 ]
             ]
+        ]);
+    }
+    /** @test */
+    public function can_update_the_associated_category()
+    {
+        $aticle = Article::factory()->create();
+
+        $category = Category::factory()->create();
+
+        $url = route('api.v1.articles.relationships.category', $aticle);
+
+        $this->withoutJsonApiDocumentFormatting();
+
+        $response = $this->patchJson($url, [
+            'data' => [
+                'type' => 'categories',
+                'id' => $category->getRouteKey()
+            ]
+        ]);
+
+        $response->assertExactJson([
+            'data' => [
+                'type' => 'categories',
+                'id' => $category->getRouteKey()
+            ]
+        ]);
+
+        $this->assertDatabaseHas('articles', [
+            'title' => $aticle->title,
+            'category_id' => $category->id
+        ]);
+    }
+    /** @test */
+    public function category_must_exist_in_database()
+    {
+        $article = Article::factory()->create();
+
+        $url = route('api.v1.articles.relationships.category', $article);
+
+        $this->withoutJsonApiDocumentFormatting();
+
+        $this->patchJson($url, [
+            'data' => [
+                'type' => 'categories',
+                'id' => 'non-existing'
+            ]
+        ])->assertJsonApiValidationError('data.id');
+
+        $this->assertDatabaseHas('articles', [
+            'title' => $article->title,
+            'category_id' => $article->category_id
         ]);
     }
 }

@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\LoginController;
+use App\Http\Middleware\ValidateJsonApiDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,11 +49,30 @@ Route::name('api.v1.')->group(function () {
 Route::get('articles/{article}/relationships/category', [ArticleCategoryController::class, 'index'])
     ->name('api.v1.articles.relationships.category');
 
+Route::patch('articles/{article}/relationships/category', [ArticleCategoryController::class, 'update'])
+    ->name('api.v1.articles.relationships.category');
+
 Route::get('articles/{article}/category', [ArticleCategoryController::class, 'show'])
     ->name('api.v1.articles.category');
 
 Route::get('articles/{article}/relationships/author', [ArticleAuthorController::class, 'index'])
     ->name('api.v1.articles.relationships.author');
 
+Route::patch('articles/{article}/relationships/author', [
+    ArticleAuthorController::class, 'update'
+])->name('api.v1.articles.relationships.author');
+
+// Route::post('articles/{article}/relationships/author', [
+//     ArticleAuthorController::class, 'destroy'
+// ])->name('api.v1.articles.relationships.author');
+
+// Route::delete('articles/{article}/relationships/author', [
+//     ArticleAuthorController::class, 'destroy'
+// ])->name('api.v1.articles.relationships.author');
+
 Route::get('articles/{article}/author', [ArticleAuthorController::class, 'show'])
     ->name('api.v1.articles.author');
+
+Route::withoutMiddleware(ValidateJsonApiDocument::class)
+    ->post('login', LoginController::class)
+    ->name('api.v1.login');
