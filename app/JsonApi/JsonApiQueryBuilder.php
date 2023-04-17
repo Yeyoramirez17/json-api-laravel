@@ -2,19 +2,19 @@
 
 namespace App\JsonApi;
 
+# use App\Exceptions\JsonApi\BadRequestHttpException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Closure;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class JsonApiQueryBuilder
 {
     public function allowedSorts(): Closure
     {
-        return function (array $allowedSorts)
-        {
+        return function (array $allowedSorts) {
             /** @var Builder $this */
-            if (request()->filled('sort'))
-            {
+            if (request()->filled('sort')) {
                 $sortFields = explode(',', request()->input('sort'));
 
                 foreach ($sortFields as $sortField) {
@@ -22,7 +22,9 @@ class JsonApiQueryBuilder
 
                     $sortField = ltrim($sortField, '-');
 
-                    abort_unless(in_array($sortField, $allowedSorts), 400);
+                    if (!in_array($sortField, $allowedSorts)) {
+                        throw new BadRequestHttpException("The sort field '{$sortField}' is not allowed in the '{$this->getResourceType()}' resource");
+                    }
 
                     $this->orderBy($sortField, $sortDirection);
                 }
@@ -37,7 +39,10 @@ class JsonApiQueryBuilder
             /** @var Builder $this */
             foreach (request('filter', []) as $filter => $value)
             {
-                abort_unless(in_array($filter, $allowedFilters), 400);
+                if (!in_array($filter, $allowedFilters))
+                {
+                    throw new BadRequestHttpException("The filter '{$filter}' is not allowed in the '{$this->getResourceType()}' resource");
+                }
 
                 $this->hasNamedScope($filter)
                     ? $this->{$filter}($value)
@@ -46,23 +51,25 @@ class JsonApiQueryBuilder
             return $this;
         };
     }
-    public function allowedIncludes() : Closure
+    public function allowedIncludes(): Closure
     {
-        return function(array $allowedIncludes)
+        return function (array $allowedIncludes)
         {
             /** @var Builder $this */
 
-            if(request()->isNotFilled('include'))
+            if (request()->isNotFilled('include'))
             {
                 return $this;
             }
 
             $includes = explode(',', request()->input('include'));
 
-            foreach($includes as $include)
+            foreach ($includes as $include)
             {
-                abort_unless(in_array($include, $allowedIncludes), 400);
-
+                if (!in_array($include, $allowedIncludes))
+                {
+                    throw new BadRequestHttpException("The included relationship '{$include}' is not allowed in the '{$this->getResourceType()}' resource");
+                }
                 return $this->with($include);
             }
             return $this;
@@ -70,8 +77,7 @@ class JsonApiQueryBuilder
     }
     public function jsonPaginate(): Closure
     {
-        return function ()
-        {
+        return function () {
             /** @var Builder $this */
             return $this->paginate(
                 $perPage = request('page.size', 15),
@@ -81,14 +87,12 @@ class JsonApiQueryBuilder
             )->appends(request()->only('sort', 'filter', 'page.size'));
         };
     }
-    public function sparseFieldset() : Closure
+    public function sparseFieldset(): Closure
     {
-        return function()
-        {
+        return function () {
             /** @var Builder $this */
 
-            if(request()->isNotFilled('fields'))
-            {
+            if (request()->isNotFilled('fields')) {
                 return $this;
             }
 
@@ -96,22 +100,19 @@ class JsonApiQueryBuilder
 
             $routeKeyName = $this->model->getRouteKeyName();
 
-            if (!in_array($routeKeyName, $fields))
-            {
+            if (!in_array($routeKeyName, $fields)) {
                 $fields[] = $routeKeyName;
             }
 
             return $this->addSelect($fields);
         };
     }
-    public function getResourceType() : Closure
+    public function getResourceType(): Closure
     {
-        return function()
-        {
+        return function () {
             /** @var Builder $this */
 
-            if(property_exists($this->model, 'resourceType'))
-            {
+            if (property_exists($this->model, 'resourceType')) {
                 return $this->model->resourceType;
             }
 

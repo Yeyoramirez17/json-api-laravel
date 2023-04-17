@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -44,4 +45,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
     public $resourceType = 'authors';
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+    public function givePermissionTo(Permission $permission)
+    {
+        $this->permissions()->syncWithoutDetaching($permission);
+    }
 }

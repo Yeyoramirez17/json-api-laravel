@@ -1,0 +1,29 @@
+[33mcommit d9a86de05b486c656ca025ad153bf34d2fe3d1bf[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Yeison Ramirez <yeisonrazar98@gmail.com>
+Date:   Sat Apr 8 13:49:48 2023 -0500
+
+    Article Relationships (Author - Category) - Author Resource - Author UUID - Chapter 45
+
+[33mcommit 6bdc067adba113288358e0e68f8deed1f57bd827[m
+Author: Yeison Ramirez <yeisonrazar98@gmail.com>
+Date:   Thu Apr 6 20:50:06 2023 -0500
+
+    Relationships, Documenet Json - Chapter 35
+
+[33mcommit b08c5c8ffba9c1e1a124c5c923afa7d972cb5c9a[m
+Author: Yeison Ramirez <yeisonrazar98@gmail.com>
+Date:   Fri Mar 31 20:09:45 2023 -0500
+
+    Sort, Paginate, Macros, Mixis - Chapter 23
+
+[33mcommit 43b84fc161b3b6166fd9769c07e5797d43b62f2d[m
+Author: Yeison Ramirez <yeisonrazar98@gmail.com>
+Date:   Mon Mar 27 20:57:58 2023 -0500
+
+    Chapter 12
+
+[33mcommit 2dd182c5e4b5fbda473f1057684a7b69ed5b9196[m
+Author: Yeison Ramirez <yeisonrazar98@gmail.com>
+Date:   Sat Mar 25 20:49:44 2023 -0500
+
+    Set up a fresh Laravel app
